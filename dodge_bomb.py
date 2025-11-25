@@ -131,7 +131,7 @@ def main():
                 sum_mv[1] += mv[1]  # 縦方向の移動量
         kk_img = kk_imgs[tuple(sum_mv)]
         kk_rct.move_ip(sum_mv)
-        if check_bound(kk_rct) != (True, True):  # 画面外なら
+        if not check_bound(kk_rct):  # 画面外なら
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])  # 移動をなかったことにする
         screen.blit(kk_img, kk_rct)
         yoko, tate = check_bound(bb_rct)
