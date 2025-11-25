@@ -51,6 +51,27 @@ def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
     return (bb_imgs, bb_accs)
 
 
+def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:
+    """
+    引数：なし
+    戻り値：辞書（押下キーに対する移動量の合計値、rotozoomしたSurface）
+    オリジナルと逆向きの場合はflipで左右反転してからrotozoomを行った
+    """
+    kk_img = pg.transform.rotozoom(pg.image.load("fig/3.png"), 0, 0.9)
+    kk_dict = {
+        (0, 0): pg.transform.rotozoom(kk_img, 0, 0.9), 
+        (+5, 0): pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 0, 0.9), 
+        (+5, -5): pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 45, 0.9), 
+        (0, -5): pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 90, 0.9), 
+        (0, +5): pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 270, 0.9), 
+        (+5, +5): pg.transform.rotozoom(pg.transform.flip(kk_img, True, False), 315, 0.9), 
+        (-5, 0): pg.transform.rotozoom(kk_img, 0, 0.9), 
+        (-5, +5): pg.transform.rotozoom(kk_img, -315, 0.9), 
+        (-5, -5): pg.transform.rotozoom(kk_img, -45, 0.9)
+    }
+    return kk_dict
+
+
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
     引数：こうかとんRectかばくだんRect
@@ -81,6 +102,7 @@ def main():
     clock = pg.time.Clock()
     tmr = 0
     bb_imgs, bb_accs = init_bb_imgs()
+    kk_imgs = get_kk_imgs()
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -107,6 +129,7 @@ def main():
             if key_lst[key]:
                 sum_mv[0] += mv[0]  # 横方向の移動量
                 sum_mv[1] += mv[1]  # 縦方向の移動量
+        kk_img = kk_imgs[tuple(sum_mv)]
         kk_rct.move_ip(sum_mv)
         if check_bound(kk_rct) != (True, True):  # 画面外なら
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])  # 移動をなかったことにする
