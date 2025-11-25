@@ -1,6 +1,7 @@
 import os
 import random
 import sys
+import time
 import pygame as pg
 
 
@@ -14,6 +15,21 @@ DELTA = {
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
+def gameover(screen: pg.Surface) -> None:
+    go_img = pg.Surface((1100, 650))
+    pg.draw.rect(go_img, (0, 0, 0), (0, 0, 1100, 650))
+    go_img.set_alpha(200)
+    fonto = pg.font.Font(None, 80)
+    txt = fonto.render("Game Over", True, (255, 255, 255))
+    go_img.blit(txt, [430, 300])
+    gk_img = pg.image.load("fig/8.png")
+    go_img.blit(gk_img, [380, 300])
+    go_img.blit(gk_img, [750, 300])
+    screen.blit(go_img, [0, 0])
+    pg.display.update()
+    time.sleep(5)
+
+    
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
     引数：こうかとんRectかばくだんRect
@@ -49,6 +65,7 @@ def main():
                 return
             
         if kk_rct.colliderect(bb_rct):  # こうかとんと爆弾が衝突したら
+            gameover(screen)
             print("ゲームオーバー")
             return
         
