@@ -16,6 +16,11 @@ os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 def gameover(screen: pg.Surface) -> None:
+    """
+    引数：Surface
+    戻り値：なし
+    こうかとんが爆弾と衝突したら画面表示する
+    """
     go_img = pg.Surface((1100, 650))
     pg.draw.rect(go_img, (0, 0, 0), (0, 0, 1100, 650))
     go_img.set_alpha(200)
@@ -29,7 +34,23 @@ def gameover(screen: pg.Surface) -> None:
     pg.display.update()
     time.sleep(5)
 
-    
+
+def init_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    """
+    引数：なし
+    戻り値：タプル（爆弾の大きさ、爆弾の加速度）
+    時間によって大きさと加速度が変わる
+    """
+    bb_imgs = []
+    bb_accs = [a for a in range (1, 11)]
+    for r in range(1, 11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+    return (bb_imgs, bb_accs)
+
+
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
     引数：こうかとんRectかばくだんRect
@@ -59,6 +80,7 @@ def main():
     vx, vy = +5, +5  # 爆弾の速度
     clock = pg.time.Clock()
     tmr = 0
+    bb_imgs, bb_accs = init_bb_imgs()
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -95,6 +117,12 @@ def main():
         if not tate:  # 縦方向にはみ出ていたら
             vy *= -1
         bb_rct.move_ip(vx, vy)
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        bb_rct.move_ip(avx, avy)
+        bb_rct.width = bb_img.get_rect().width
+        bb_rct.height = bb_img.get_rect().height
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
